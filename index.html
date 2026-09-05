@@ -54,6 +54,30 @@ img{max-width:100%}
   --shadow-lift:0 2px 6px rgba(0,0,0,.55), 0 22px 48px -18px rgba(0,0,0,.9);
 }
 
+/* 使用者手動選的主題，優先於系統設定 */
+:root[data-app-theme="light"]{
+  --bg:#ECF1EF; --surface:#FFFFFF; --surface-2:#F3F7F6; --surface-3:#E3EAE8;
+  --line:#CBD5D3; --line-soft:#E0E7E5;
+  --text:#0C1D1B; --text-2:#465755; --text-3:#697876;
+  --accent:#0D6E60; --accent-2:#0A594E; --accent-ink:#FFFFFF; --accent-wash:#DFEFEC;
+  --muscle:#1F5CA3; --artery:#AC2B26; --nerve:#8C6605; --gold:#8F6310;
+  --danger:#AC2B26; --good:#0F6A47;
+  --shadow:0 1px 2px rgba(12,29,27,.07), 0 8px 24px -12px rgba(12,29,27,.2);
+  --shadow-lift:0 2px 4px rgba(12,29,27,.1), 0 20px 44px -18px rgba(12,29,27,.4);
+}
+:root[data-app-theme="dark"]{
+  --bg:#0A1211; --surface:#15201F; --surface-2:#1C2827; --surface-3:#26332F;
+  --line:#31413F; --line-soft:#232F2E;
+  --text:#EDF3F1; --text-2:#A9BCB9; --text-3:#8DA09D;
+  --accent:#37C4AF; --accent-2:#5BDDC8; --accent-ink:#032420; --accent-wash:#123531;
+  --muscle:#8CBEF0; --artery:#F4938A; --nerve:#EEC556; --gold:#EDC96C;
+  --danger:#F4938A; --good:#5CD5A0;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px -14px rgba(0,0,0,.75);
+  --shadow-lift:0 2px 6px rgba(0,0,0,.55), 0 22px 48px -18px rgba(0,0,0,.9);
+}
+/* 純黑省電模式的觀感：卡片與底色對比再拉開一點 */
+:root[data-app-theme="dark"] body{background:var(--bg)}
+
 *{box-sizing:border-box}
 body{
   background:var(--bg); color:var(--text); font-family:var(--ff-body);
@@ -261,6 +285,15 @@ select,.inp{
 .sheet-close{font-size:14px;font-weight:700;color:var(--text-2);padding:7px 12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line)}
 .sheet-bd{overflow-y:auto;padding:15px 17px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:13px}
 
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-m);padding:4px}
+.seg button{padding:10px 6px;border-radius:9px;font-size:14.5px;font-weight:700;color:var(--text-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.prow.locked{cursor:default}
+.confirm[disabled]{background:var(--surface-2);color:var(--text-3);border:1px solid var(--line);box-shadow:none;pointer-events:none}
+.targets{display:flex;gap:6px;flex-wrap:wrap}
+.tbtn{padding:5px 11px;border-radius:99px;font-size:13.5px;font-weight:700;background:var(--surface-2);border:1px solid var(--line);color:var(--text-2)}
+.tbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.lockmsg{padding:12px 14px;border-radius:var(--r-m);border:1px dashed var(--line);color:var(--text-3);font-size:13.5px;line-height:1.6;text-align:center}
 .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .qbtn{padding:14px 4px;border-radius:var(--r-m);background:var(--surface);border:1px solid var(--line);font-family:var(--ff-mono);font-size:17px;font-weight:700}
 .qbtn:active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -328,6 +361,7 @@ select,.inp{
 </style>
 </head>
 <body>
+<script>try{var _t=localStorage.getItem("dwt.theme");if(_t)document.documentElement.setAttribute("data-app-theme",_t);}catch(e){}</script>
 
 <div id="app">
 
@@ -353,6 +387,7 @@ select,.inp{
       </button>
     </div>
     <div class="notice" id="cloudNotice" hidden></div>
+    <div class="seg" id="homeTheme"></div>
     <p class="foot-note">計分規則依《解剖白色巨塔》說明書。</p>
   </section>
 
@@ -364,7 +399,7 @@ select,.inp{
       <p class="lede">先填你自己的資料，建立後把代碼給其他玩家。</p>
     </header>
     <div class="card">
-      <div class="field"><span>你的名字</span><input id="cName" class="inp" type="text" maxlength="10" placeholder="例如 奕叡"></div>
+      <div class="field"><span>你的名字</span><input id="cName" class="inp" type="text" maxlength="10" placeholder="例如 小明"></div>
       <div class="row2">
         <label class="field"><span>角色</span><select id="cRole"></select></label>
         <label class="field"><span>加分牌</span><select id="cBonus"></select></label>
@@ -395,7 +430,7 @@ select,.inp{
       <div class="field"><span>房間代碼</span><input id="jCode" class="code" type="text" maxlength="4" inputmode="latin" autocapitalize="characters" placeholder="XXXX"></div>
     </div>
     <div class="card">
-      <div class="field"><span>你的名字</span><input id="jName" class="inp" type="text" maxlength="10" placeholder="例如 冠儒"></div>
+      <div class="field"><span>你的名字</span><input id="jName" class="inp" type="text" maxlength="10" placeholder="例如 小明"></div>
       <div class="row2">
         <label class="field"><span>角色</span><select id="jRole"></select></label>
         <label class="field"><span>加分牌</span><select id="jBonus"></select></label>
@@ -429,6 +464,7 @@ select,.inp{
     </div>
     <button id="startGame" class="btn primary full lg">開始計分</button>
     <button class="link" id="backHomeFromSetup" data-back="home" hidden>← 回上一頁</button>
+    <div class="seg" id="setupTheme"></div>
     <p class="foot-note">紀錄存在這支手機，重新整理不會不見。</p>
   </section>
 
@@ -452,6 +488,7 @@ select,.inp{
         <strong id="activeName">—</strong>
         <span class="off" id="offTurn" hidden>非其回合</span>
       </div>
+      <div class="targets" id="targetSel" hidden></div>
       <div id="bonusChipWrap" hidden></div>
       <div class="pairs" id="pairGrid"></div>
       <div class="deck-actions">
@@ -654,6 +691,36 @@ const roleOf  = (p) => ROLES.find(r=> r.n === p.role);
 const bonusOf = (p) => BONUS.find(b=> b.k === p.bonus);
 const nameOf  = (pid) => (G.players[pid] && G.players[pid].name) || "？";
 
+/* 主題 */
+const TKEY = "dwt.theme";
+function getTheme(){ return lsGet(TKEY) || ""; }
+function setTheme(v){
+  if(v) { lsSet(TKEY, v); document.documentElement.setAttribute("data-app-theme", v); }
+  else  { lsDel(TKEY);   document.documentElement.removeAttribute("data-app-theme"); }
+}
+function themeControl(){
+  const wrap = document.createElement("div"); wrap.className = "seg";
+  [["", "跟隨系統"], ["light", "淺色"], ["dark", "深色"]].forEach(([v, label])=>{
+    const b = document.createElement("button");
+    b.textContent = label;
+    b.setAttribute("aria-pressed", String(getTheme() === v));
+    b.addEventListener("click", ()=>{
+      setTheme(v);
+      Array.prototype.forEach.call(wrap.children, (c, i)=>
+        c.setAttribute("aria-pressed", String(["", "light", "dark"][i] === v)));
+    });
+    wrap.appendChild(b);
+  });
+  return wrap;
+}
+
+/* 連線模式：只能替自己（和自己代管的玩家）計分 */
+function myTargets(){
+  if(MODE !== "cloud") return seats().map(p=> p.id);
+  return seats().filter(p=> p.id === MEID || p.owner === MEID).map(p=> p.id);
+}
+function canScore(pid){ return myTargets().indexOf(pid) >= 0; }
+
 /* ════ 畫面切換 ════ */
 const SCREENS = ["home","create","join","setup","game"];
 function goto(id){
@@ -726,11 +793,15 @@ function renderBoard(){
 
   rows.forEach((row, i)=>{
     const p = row.p;
+    const mine = canScore(p.id);
     const btn = document.createElement("button");
-    btn.className = "prow" + (p.id === tpid ? " turn" : "");
+    btn.className = "prow" + (p.id === tpid ? " turn" : "") + (mine ? "" : " locked");
     btn.dataset.rank = i + 1;
-    btn.setAttribute("aria-pressed", String(p.id === ACTIVE));
-    btn.addEventListener("click", ()=>{ ACTIVE = p.id; armedBonus = false; render(); });
+    btn.setAttribute("aria-pressed", String(mine && p.id === ACTIVE));
+    btn.addEventListener("click", ()=>{
+      if(!mine){ toast("只能替自己計分，避免誤按", ""); return; }
+      ACTIVE = p.id; armedBonus = false; render();
+    });
 
     const rank = document.createElement("span");
     rank.className = "rank";
@@ -778,7 +849,9 @@ function renderBoard(){
   bt.textContent = (G.meta.target || 200) + " 分 / " + (G.meta.perfect || 4) + " 組完美重建";
   l1.appendChild(bt);
   const l2 = document.createElement("span");
-  l2.textContent = "點玩家可臨時替他計分；按「完成，換下一位」輪到下一家，一圈後回合自動 +1。";
+  l2.textContent = MODE === "cloud"
+    ? "每支手機只能替自己計分。按「完成，換下一位」輪到下一家，一圈後回合自動 +1。"
+    : "點玩家可臨時替他計分；按「完成，換下一位」輪到下一家，一圈後回合自動 +1。";
   strip.append(l1, l2);
   board.appendChild(strip);
 }
@@ -786,14 +859,41 @@ function renderBoard(){
 function renderDeck(){
   const list = seats();
   if(!list.length) return;
-  if(!G.players[ACTIVE]) ACTIVE = turnPid();
-  const p = Object.assign({id:ACTIVE}, G.players[ACTIVE]);
+  const tg = myTargets();
+  if(tg.indexOf(ACTIVE) < 0) ACTIVE = tg.length ? tg[0] : null;
   const tpid = turnPid();
+  const grid = $("#pairGrid");
+  const wrap = $("#bonusChipWrap");
+  const cf = $("#confirmTurn");
 
+  if(!ACTIVE){
+    $("#activeName").textContent = "—";
+    $("#offTurn").hidden = true;
+    wrap.hidden = true;
+    grid.textContent = "";
+    const m = document.createElement("div"); m.className = "lockmsg";
+    m.textContent = "你目前不在這個房間的玩家名單裡。請從「⋯ → 離開房間」重新加入。";
+    grid.appendChild(m);
+    cf.disabled = true; cf.textContent = "等待其他玩家";
+    return;
+  }
+
+  const p = Object.assign({id:ACTIVE}, G.players[ACTIVE]);
   $("#activeName").textContent = p.name;
   $("#offTurn").hidden = (p.id === tpid);
 
-  const wrap = $("#bonusChipWrap");
+  const tsel = $("#targetSel");
+  if(MODE === "cloud" && tg.length > 1){
+    tsel.hidden = false; tsel.textContent = "";
+    tg.forEach(id=>{
+      const b = document.createElement("button");
+      b.className = "tbtn"; b.textContent = nameOf(id);
+      b.setAttribute("aria-pressed", String(id === ACTIVE));
+      b.addEventListener("click", ()=>{ ACTIVE = id; armedBonus = false; render(); });
+      tsel.appendChild(b);
+    });
+  } else tsel.hidden = true;
+
   wrap.textContent = "";
   const bc = G.meta.useBonus ? bonusOf(p) : null;
   if(bc){
@@ -813,7 +913,6 @@ function renderDeck(){
     wrap.appendChild(chip);
   } else wrap.hidden = true;
 
-  const grid = $("#pairGrid");
   grid.textContent = "";
   PAIRS.forEach(pr=>{
     const b = document.createElement("button");
@@ -830,7 +929,17 @@ function renderDeck(){
 
   const idx = list.findIndex(x=> x.id === tpid);
   const nxt = list[(idx + 1) % list.length];
-  $("#nextHint").textContent = nxt ? "→ " + nxt.name : "";
+  const myTurn = (MODE !== "cloud") || canScore(tpid);
+  cf.disabled = !myTurn;
+  cf.textContent = "";
+  if(myTurn){
+    cf.appendChild(document.createTextNode("完成，換下一位 "));
+    const em = document.createElement("em"); em.id = "nextHint";
+    em.textContent = nxt ? "→ " + nxt.name : "";
+    cf.appendChild(em);
+  } else {
+    cf.appendChild(document.createTextNode("輪到 " + nameOf(tpid) + " 操作"));
+  }
 }
 
 function renderRoomStrip(){
@@ -1113,15 +1222,34 @@ function sheetExtra(){
     const others = seats().filter(x=> x.id !== pid);
     if(others.length){
       const t4 = document.createElement("p"); t4.className = "sect-t"; t4.textContent = "分數轉移（難搞家屬、分配正義）";
+      const dir = document.createElement("div"); dir.className = "seg";
+      let mode = "take";
+      const dirBtns = [["take", "從他拿"], ["give", "給他"]].map(([v, label])=>{
+        const b = document.createElement("button"); b.textContent = label;
+        b.setAttribute("aria-pressed", String(v === mode));
+        b.addEventListener("click", ()=>{
+          mode = v;
+          dirBtns.forEach((x, i)=> x.setAttribute("aria-pressed", String(["take", "give"][i] === v)));
+          others.forEach((o, i)=> sel.options[i].textContent = (v === "take" ? "從 " : "給 ") + o.name);
+        });
+        dir.appendChild(b); return b;
+      });
+      dir.style.gridTemplateColumns = "1fr 1fr";
+
       const g3 = document.createElement("div"); g3.className = "inline3";
       const sel = document.createElement("select");
-      others.forEach(o=> sel.appendChild(new Option("從 " + o.name + " 拿", o.id)));
+      others.forEach(o=> sel.appendChild(new Option("從 " + o.name, o.id)));
       const amt = document.createElement("select");
       [10, 15, 5, 20, 25].forEach(v=> amt.appendChild(new Option(v + " 分", v)));
       const go2 = document.createElement("button"); go2.className = "btn primary"; go2.textContent = "轉移";
-      go2.addEventListener("click", ()=>{ transfer(sel.value, pid, parseInt(amt.value, 10)); close(); });
+      go2.addEventListener("click", ()=>{
+        const n = parseInt(amt.value, 10);
+        if(mode === "take") transfer(sel.value, pid, n);
+        else transfer(pid, sel.value, n);
+        close();
+      });
       g3.append(sel, amt, go2);
-      bd.append(t4, g3);
+      bd.append(t4, dir, g3);
     }
   });
 }
@@ -1220,6 +1348,12 @@ function sheetRef(){
 
 function sheetMenu(){
   sheet("設定", (bd, close)=>{
+    const tt = document.createElement("p"); tt.className = "sect-t"; tt.textContent = "外觀";
+    bd.append(tt, themeControl());
+
+    const st = document.createElement("p"); st.className = "sect-t"; st.textContent = "這一局";
+    bd.appendChild(st);
+
     if(MODE === "cloud"){
       const info = document.createElement("div"); info.className = "notice";
       const b = document.createElement("b"); b.textContent = "房間 " + ROOM;
@@ -1227,16 +1361,21 @@ function sheetMenu(){
       bd.appendChild(info);
 
       const addP = document.createElement("button"); addP.className = "btn ghost full";
-      addP.textContent = "代為新增玩家（沒帶手機的人）";
+      addP.textContent = "代為新增玩家（沒帶手機的人，由你幫他計分）";
       addP.addEventListener("click", ()=>{
         const nm = prompt("玩家名字");
         if(nm && nm.trim()){
           const seat = seats().length + 1;
-          wPlayer(uid(), {name:nm.trim(), role:"", bonus:"", seat:seat, skip:false});
+          wPlayer(uid(), {name:nm.trim(), role:"", bonus:"", seat:seat, skip:false, owner:MEID, proxy:true});
           close();
         }
       });
       bd.appendChild(addP);
+
+      const force = document.createElement("button"); force.className = "btn ghost full";
+      force.textContent = "強制換下一位（對方手機沒反應時）";
+      force.addEventListener("click", ()=>{ nextTurn(); close(); });
+      bd.appendChild(force);
     } else {
       const back = document.createElement("button"); back.className = "btn ghost full";
       back.textContent = "回到設定（改名稱／角色／加分牌）";
@@ -1366,6 +1505,8 @@ Array.prototype.forEach.call(document.querySelectorAll("[data-back]"), (b)=>{
 /* ════ 啟動 ════ */
 (function boot(){
   const hasCloud = cloudReady();
+  const ht = $("#homeTheme"); if(ht) ht.replaceWith(Object.assign(themeControl(), {id:"homeTheme"}));
+  const st = $("#setupTheme"); if(st) st.replaceWith(Object.assign(themeControl(), {id:"setupTheme"}));
 
   if(CLOUD_BUILD){
     fillSelects($("#cRole"), $("#cBonus"));
